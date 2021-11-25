@@ -2,6 +2,8 @@ package io
 
 import (
 	"bufio"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -19,7 +21,6 @@ func WriteStringToFile(filename string, content string) {
 		log.Fatal(err2)
 	}
 }
-
 
 func ReadLines(path string) ([]string, error) {
 	file, err := os.Open(path)
@@ -47,6 +48,28 @@ func ListAllFilesInDir(path string) ([]string, error) {
 		domainFiles = append(domainFiles, f.Name())
 	}
 
-
 	return domainFiles, err
+}
+
+func IsEmpty(name string) (bool, error) {
+	f, err := os.Open(name)
+	if err != nil {
+		return false, err
+	}
+	defer f.Close()
+
+	_, err = f.Readdirnames(1) // Or f.Readdir(1)
+	if err == io.EOF {
+		return true, nil
+	}
+	return false, err // Either not empty or error, suits both cases
+}
+
+func GetUserInput(userPrompt string) (string, error) {
+
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print(userPrompt)
+
+	return reader.ReadString('\n')
+
 }
